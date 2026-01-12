@@ -142,7 +142,7 @@ public class TxtSubscribe {
                         try {
                             jsonobj.addProperty("name", str2);
                             jsonobj.add("urls", jsonarr3);
-                            jsonobj.add("logoUrl", channelLogoMap.get(str2));
+                            jsonobj.addProperty("logoUrl", channelLogoMap.get(str2));
 
                         } catch (Throwable e) {
                         }
