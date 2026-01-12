@@ -765,7 +765,11 @@ public class LivePlayActivity extends BaseActivity {
             String savedEpgKey = channel_Name.getChannelName() + "_" + epgDateAdapter.getItem(epgDateAdapter.getSelectedIndex()).getDatePresented();
             if (hsEpg.containsKey(savedEpgKey)) {
                 String[] epgInfo = EpgUtil.getEpgInfo(channel_Name.getChannelName());
-                getTvLogo(channel_Name.getChannelName(), epgInfo == null ? null : epgInfo[0]);
+                String channelLogoUrl = channel_Name.getLogoUrl();
+                if (StringUtils.isEmpty(channelLogoUrl) && epgInfo != null) {
+                    channelLogoUrl = epgInfo[0];
+                }
+                getTvLogo(channel_Name.getChannelName(), channelLogoUrl);
                 ArrayList arrayList = (ArrayList) hsEpg.get(savedEpgKey);
                 if (arrayList != null && arrayList.size() > 0) {
                     Date date = new Date();
