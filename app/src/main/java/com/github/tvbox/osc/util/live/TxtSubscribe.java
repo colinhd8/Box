@@ -8,6 +8,7 @@ import java.io.StringReader;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,16 +16,17 @@ public class TxtSubscribe {
 
     private static final Pattern NAME_PATTERN = Pattern.compile(".*,(.+?)$");
     private static final Pattern GROUP_PATTERN = Pattern.compile("group-title=\"(.*?)\"");
+    private static final Pattern LOGO_PATTERN = Pattern.compile("tvg-logo=\"(.*?)\"");
 
-    public static void parse(LinkedHashMap<String, LinkedHashMap<String, ArrayList<String>>> linkedHashMap, String str) {
+    public static void parse(LinkedHashMap<String, LinkedHashMap<String, ArrayList<String>>> linkedHashMap, Map<String, String> channelLogoMap, String str) {
         if (str.startsWith("#EXTM3U")) {
-            parseM3u(linkedHashMap, str);
+            parseM3u(linkedHashMap, channelLogoMap, str);
         } else {
             parseTxt(linkedHashMap, str);
         }
     }
 
-    private static void parseM3u(LinkedHashMap<String, LinkedHashMap<String, ArrayList<String>>> linkedHashMap, String str) {
+    private static void parseM3u(LinkedHashMap<String, LinkedHashMap<String, ArrayList<String>>> linkedHashMap, Map<String, String> channelLogoMap, String str) {
         ArrayList<String> urls;
         try {
             BufferedReader bufferedReader = new BufferedReader(new StringReader(str));
@@ -37,6 +39,7 @@ public class TxtSubscribe {
                 if (line.startsWith("#EXTINF")) {
                     String name = getStrByRegex(NAME_PATTERN, line);
                     String group = getStrByRegex(GROUP_PATTERN, line);
+                    String logoUrl = getStrByRegex(LOGO_PATTERN, line);
                     // 此时再读取一行，就是对应的 url 链接了
                     String url = bufferedReader.readLine().trim();
                     if (linkedHashMap.containsKey(group)) {
@@ -52,6 +55,7 @@ public class TxtSubscribe {
                         channelTemp.put(name, urls);
                     }
                     if (null != urls && !urls.contains(url)) urls.add(url);
+                    channelLogoMap.put(name, logoUrl);
                 }
             }
             bufferedReader.close();
@@ -121,7 +125,7 @@ public class TxtSubscribe {
         }
     }
 
-    public static JsonArray live2JsonArray(LinkedHashMap<String, LinkedHashMap<String, ArrayList<String>>> linkedHashMap) {
+    public static JsonArray live2JsonArray(LinkedHashMap<String, LinkedHashMap<String, ArrayList<String>>> linkedHashMap, Map<String, String> channelLogoMap) {
         JsonArray jsonarr = new JsonArray();
         for (String str : linkedHashMap.keySet()) {
             JsonArray jsonarr2 = new JsonArray();
@@ -138,6 +142,8 @@ public class TxtSubscribe {
                         try {
                             jsonobj.addProperty("name", str2);
                             jsonobj.add("urls", jsonarr3);
+                            jsonobj.add("logoUrl", channelLogoMap.get(str2));
+
                         } catch (Throwable e) {
                         }
                         jsonarr2.add(jsonobj);

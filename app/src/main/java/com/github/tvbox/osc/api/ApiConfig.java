@@ -709,6 +709,9 @@ public class ApiConfig {
                 JsonObject obj = (JsonObject) channelElement;
                 LiveChannelItem liveChannelItem = new LiveChannelItem();
                 liveChannelItem.setChannelName(obj.get("name").getAsString().trim());
+                JsonElement eLogoUrl = obj.get("logoUrl");
+                String strLogoUrl = eLogoUrl != null ? eLogoUrl.getAsString() : null;
+                liveChannelItem.setLogoUrl(strLogoUrl);
                 liveChannelItem.setChannelIndex(channelIndex++);
                 liveChannelItem.setChannelNum(++channelNum);
                 ArrayList<String> urls = DefaultConfig.safeJsonStringList(obj, "urls");

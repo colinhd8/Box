@@ -21,6 +21,8 @@ public class LiveChannelItem {
     private String channelName;
     private ArrayList<String> channelSourceNames;
     private ArrayList<String> channelUrls;
+    private String logoUrl;
+
     public int sourceIndex = 0;
     public int sourceNum = 0;
     public boolean include_back = false;
@@ -56,6 +58,14 @@ public class LiveChannelItem {
 
     public String getChannelName() {
         return channelName;
+    }
+
+    public String getLogoUrl() {
+        return logoUrl;
+    }
+
+    public void setLogoUrl(String logoUrl) {
+        this.logoUrl = logoUrl;
     }
 
     public ArrayList<String> getChannelUrls() {

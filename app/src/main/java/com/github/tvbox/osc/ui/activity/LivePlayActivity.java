@@ -74,17 +74,7 @@ import org.json.JSONObject;
 
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Hashtable;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.TimeZone;
+import java.util.*;
 
 import kotlin.Pair;
 import xyz.doikki.videoplayer.player.VideoView;
@@ -828,11 +818,16 @@ public class LivePlayActivity extends BaseActivity {
     public void getEpg(Date date) {
 
         String channelName = channel_Name.getChannelName();
+        String channelLogoUrl = channel_Name.getLogoUrl();
         SimpleDateFormat timeFormat = new SimpleDateFormat("yyyy-MM-dd");
         timeFormat.setTimeZone(TimeZone.getTimeZone("GMT+8:00"));
         String[] epgInfo = EpgUtil.getEpgInfo(channelName);
         String epgTagName = channelName;
-        getTvLogo(channelName, epgInfo == null ? null : epgInfo[0]);
+
+        if (StringUtils.isEmpty(channelLogoUrl) && epgInfo != null) {
+            channelLogoUrl = epgInfo[0];
+        }
+        getTvLogo(channelName, channelLogoUrl);
         if (epgInfo != null && !epgInfo[1].isEmpty()) {
             epgTagName = epgInfo[1];
         }
@@ -1764,8 +1759,9 @@ public class LivePlayActivity extends BaseActivity {
             public void onSuccess(Response<String> response) {
                 JsonArray livesArray;
                 LinkedHashMap<String, LinkedHashMap<String, ArrayList<String>>> linkedHashMap = new LinkedHashMap<>();
-                TxtSubscribe.parse(linkedHashMap, response.body());
-                livesArray = TxtSubscribe.live2JsonArray(linkedHashMap);
+                Map<String, String> channelLogoMap = new HashMap<>();
+                TxtSubscribe.parse(linkedHashMap, channelLogoMap, response.body());
+                livesArray = TxtSubscribe.live2JsonArray(linkedHashMap, channelLogoMap);
 
                 ApiConfig.get().loadLives(livesArray);
                 List<LiveChannelGroup> list = ApiConfig.get().getChannelGroupList();
